@@ -71,8 +71,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   productImg: {
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
   },
   name: {
     fontSize: 28,

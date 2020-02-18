@@ -27,8 +27,8 @@ import * as Interaction from '../Shared/Interaction';
 import { $fetchProfile } from '../Auth/state';
 
 const withStore = connect((state) => ({
-  processing: state.Activity.processing,
-  user: state.Auth.user,
+  //processing: state.Activity.processing,
+  //user: state.Auth.user,
 }));
 
 const propTypes = {
@@ -42,7 +42,7 @@ const Wrapper = (C) => withStore(C);
 
 const styles = StyleSheet.create({
   header: {
-    height: 200,
+    height: 50,
     paddingTop: 6,
   },
   fontSize: {
@@ -62,11 +62,11 @@ const styles = StyleSheet.create({
   },
 });
 
-class ProfileView extends Component {
+class SettingsView extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
 
-    dispatch($fetchProfile()).catch((error) => Interaction.toast(Interaction.FAILURE, error.message));
+    //dispatch($fetchProfile()).catch((error) => Interaction.toast(Interaction.FAILURE, error.message));
   }
 
   render() {
@@ -75,41 +75,14 @@ class ProfileView extends Component {
     return (
       <Container>
         <Header span style={styles.header}>
-          <View style={[STYLE.fit, STYLE.flex_center]}>
-            <View
-              style={{
-                alignItems: 'center',
-                padding: 8,
-              }}
-            >
-              <Thumbnail large resizeMode="cover" source={{ uri: user.picture_uri }} />
-              <Text style={styles.user_name}>{user.name}</Text>
-            </View>
-          </View>
-          <Left>
-            <Button transparent onPress={() => this.props.navigation.openDrawer()}>
-              {processing ? <Spinner size="small" inverse /> : <Icon name="menu" />}
-            </Button>
-          </Left>
+          <Text style={styles.user_name}>settings</Text>
           <Body />
           <Right />
         </Header>
 
         <Content>
           <View style={[STYLE.flex, STYLE.flex_row, STYLE.flex_center]}>
-            <Card transparent style={styles.card}>
-              <CardItem>
-                <Body>
-                  <Label style={styles.fontSize}>Email</Label>
-                  <Text style={styles.fontSize}>{user.email}</Text>
-                </Body>
-                {/* {user.emailVerified ? (
-                <Icon name="ios-checkmark-circle-outline" style={{ color: COLOR.success }} />
-              ) : (
-                <Icon name="ios-checkmark-circle-outline" style={{ color: 'gray' }} />
-              )} */}
-              </CardItem>
-            </Card>
+            <Text>hello in settings</Text>
           </View>
         </Content>
       </Container>
@@ -117,6 +90,6 @@ class ProfileView extends Component {
   }
 }
 
-ProfileView.propTypes = propTypes;
+SettingsView.propTypes = propTypes;
 
-export default Wrapper(ProfileView);
+export default Wrapper(SettingsView);

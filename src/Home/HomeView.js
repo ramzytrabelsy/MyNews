@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, ScrollView, RefreshControl } from 'react-native';
 import {
   Container,
   Header,
@@ -27,9 +27,7 @@ import { COLOR, STYLE } from '../common/styles';
 
 import * as Interaction from '../Shared/Interaction';
 
-import {
-  $fetchPosts, $updatePost, $removePost, $createPost,
-} from './state';
+import { $fetchPosts } from './state';
 
 const withStore = connect((state) => ({
   processing: state.Activity.processingByOperation[$fetchPosts.OPERATION] || false,
@@ -56,9 +54,14 @@ const styles = StyleSheet.create({
 });
 
 class HomeView extends Component {
-  state = {
-    text: '',
-  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      refreshing: props.processing,
+      text: '',
+    };
+  }
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -66,21 +69,16 @@ class HomeView extends Component {
     dispatch($fetchPosts()).catch((error) => Interaction.toast(Interaction.FAILURE, error.message));
   }
 
-  /* createPost() {
-    const { dispatch } = this.props;
-    const { text } = this.state;
-    dispatch($createPost({ title: text }));
-    this.setState({ text: '' });
-  } */
+  _refresh() {
+    const { processing, posts, dispatch } = this.props;
+    this.setState({
+      refreshing: processing
+    }, () => {
+      dispatch($fetchPosts()).catch((error) => Interaction.toast(Interaction.FAILURE, error.message));
+    })
 
-  searchPost(value) {
-    const { dispatch } = this.props;
-    const { text } = this.state;
-
-    this.setState({ text: value });
-
-    console.log(text)
   }
+
 
   render() {
     const { processing, posts, dispatch } = this.props;
@@ -89,7 +87,7 @@ class HomeView extends Component {
       <Container>
         <Header>
           <Left>
-              {processing ? <Spinner size="small" inverse /> : null }
+            {processing ? <Spinner size="small" inverse /> : null}
           </Left>
           <Body>
             <Title>Articles</Title>
@@ -104,8 +102,8 @@ class HomeView extends Component {
           <FlatList
             contentContainerStyle={[STYLE.flex_grow, STYLE.padder]}
             data={posts}
-            keyExtractor={(item,index ) => index}
-            renderItem={({ item , index }) => (
+            keyExtractor={(item, index) => index}
+            renderItem={({ item, index }) => (
 
               <CardItem key={index} button bordered onPress={() => this.props.navigation.navigate('/about', { item: item })}>
                 <Left>
@@ -120,6 +118,12 @@ class HomeView extends Component {
                 </Right>
               </CardItem>
             )}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={()=>this._refresh()}
+              />
+            }
           />
         </Content>
       </Container>

@@ -56,7 +56,7 @@ export const $fetchPosts = StateHelper.createAsyncOperation(MODULE, 'fetchPosts'
     dispatch($fetchPosts.request());
 
     try {
-      const response = await fetch(`${API_ENDPOINT}/v2/everything?q=bitcoin&from=2020-01-17&sortBy=publishedAt&apiKey=${API_KEY}`);
+      const response = await fetch(`${API_ENDPOINT}/v2/top-headlines?country=us&category=business&apiKey=${API_KEY}`);
       const result = await FetchHelper.ResponseHandler(response);
       
       return dispatch($fetchPosts.success({ data: result.articles }));

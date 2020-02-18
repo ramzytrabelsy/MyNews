@@ -1,6 +1,7 @@
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createDrawerNavigator } from 'react-navigation-drawer';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
 
 import NavigationMenu from './NavigationMenu';
 
@@ -8,7 +9,7 @@ import DebugView from '../Shared/DebugView';
 import DraftView from '../Shared/DraftView';
 
 import Home from '../Home';
-import ProfileView from './ProfileView';
+import SettingsView from './SettingsView';
 import AboutView from './AboutView';
 
 const extra = process.env.NODE_ENV === 'development'
@@ -18,15 +19,18 @@ const extra = process.env.NODE_ENV === 'development'
   }
   : {};
 
-const MainStack = createDrawerNavigator(
+const MainStack = createBottomTabNavigator(
   {
-    ...extra,
-    '/home': { screen: Home },
-    '/profile': { screen: ProfileView },
-    '/about': { screen: AboutView },
+    '/home': { screen: Home,
+     navigationOptions: ({ screenProps }) => ({
+        tabBarLabel: "News"
+      })},
+    '/profile': { screen: SettingsView,
+      navigationOptions: ({ screenProps }) => ({
+        tabBarLabel: "settings"
+      })},
   },
   {
-    contentComponent: NavigationMenu,
     initialRouteName: '/home',
   },
 );
@@ -34,6 +38,7 @@ const MainStack = createDrawerNavigator(
 const RootStack = createStackNavigator(
   {
     '/main': { screen: MainStack },
+    '/about': { screen: AboutView },
     '/modal': {
       screen: (props) => {
         return props.navigation.state.params.render ? props.navigation.state.params.render(props) : null;
