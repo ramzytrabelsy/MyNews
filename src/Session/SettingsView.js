@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Switch } from 'react-native';
 import {
   Container,
   Header,
@@ -24,18 +24,16 @@ import { COLOR, STYLE } from '../common/styles';
 
 import * as Interaction from '../Shared/Interaction';
 
-import { $fetchProfile } from '../Auth/state';
+import { $setLanguage } from './state';
 
 const withStore = connect((state) => ({
-  //processing: state.Activity.processing,
+  state: state.Session.messages
   //user: state.Auth.user,
 }));
 
 const propTypes = {
   ...PropTypes.withRouting,
   ...PropTypes.withState,
-  processing: PropTypes.bool.isRequired,
-  user: PropTypes.User.isRequired,
 };
 
 const Wrapper = (C) => withStore(C);
@@ -63,14 +61,24 @@ const styles = StyleSheet.create({
 });
 
 class SettingsView extends Component {
-  componentDidMount() {
+
+  state = { 
+    switchValue: false
+  }
+
+
+
+  toggleSwitch = (value) => {
     const { dispatch } = this.props;
 
-    //dispatch($fetchProfile()).catch((error) => Interaction.toast(Interaction.FAILURE, error.message));
+    this.setState({ switchValue: value })
+
+    //dispatch($setLanguage("en"))
   }
 
   render() {
-    const { user, processing } = this.props;
+    const { user, processing ,state } = this.props;
+    
 
     return (
       <Container>
@@ -81,8 +89,16 @@ class SettingsView extends Component {
         </Header>
 
         <Content>
-          <View style={[STYLE.flex, STYLE.flex_row, STYLE.flex_center]}>
+          <View style={[STYLE.flex, STYLE.flex_center]}>
             <Text>hello in settings</Text>
+            <View style={STYLE.flex_row}>
+            <Text>Anglais</Text>
+            <Switch
+              style={{ marginTop: 30 }}
+              onValueChange={this.toggleSwitch}
+              value={this.state.switchValue} />
+            <Text>francais</Text>  
+            </View>  
           </View>
         </Content>
       </Container>
