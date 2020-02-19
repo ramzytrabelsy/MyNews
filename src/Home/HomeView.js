@@ -60,6 +60,7 @@ class HomeView extends Component {
     this.state = {
       refreshing: props.processing,
       text: '',
+      posts_items: props.posts
     };
   }
 
@@ -67,6 +68,25 @@ class HomeView extends Component {
     const { dispatch } = this.props;
 
     dispatch($fetchPosts()).catch((error) => Interaction.toast(Interaction.FAILURE, error.message));
+  }
+
+  _searchPost(text) {
+    const { posts } = this.props;
+    //passing the inserted text in textinput
+    const newData = posts.filter(function(item) {
+      //applying filter for the inserted text in search bar
+      const itemData = item.title ? item.title.toUpperCase() : ''.toUpperCase();
+      const textData = text.toUpperCase();
+      return itemData.indexOf(textData) > -1;
+    });
+    console.log("jdhjdjdjdjjdjdjdjdjdj");
+    console.log(newData);
+    this.setState({
+      //setting the filtered newData on datasource
+      //After setting the data it will automatically re-render the view
+      posts_items: newData,
+      text: text,
+    });
   }
 
   _refresh() {
@@ -82,7 +102,7 @@ class HomeView extends Component {
 
   render() {
     const { processing, posts, dispatch } = this.props;
-    const { text } = this.state;
+    const { text , posts_items } = this.state;
     return (
       <Container>
         <Header>
@@ -96,12 +116,12 @@ class HomeView extends Component {
         </Header>
         <Content padder>
           <Item>
-            <Input placeholder="Search " value={text} onChangeText={(value) => this.searchPost(value)} />
+            <Input placeholder="Search " value={text} onChangeText={(text) => this._searchPost(text)} />
           </Item>
 
           <FlatList
             contentContainerStyle={[STYLE.flex_grow, STYLE.padder]}
-            data={posts}
+            data={posts_items}
             keyExtractor={(item, index) => index}
             renderItem={({ item, index }) => (
 
@@ -121,7 +141,7 @@ class HomeView extends Component {
             refreshControl={
               <RefreshControl
                 refreshing={this.state.refreshing}
-                onRefresh={()=>this._refresh()}
+                onRefresh={() => this._refresh()}
               />
             }
           />
