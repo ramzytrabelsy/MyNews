@@ -60,10 +60,10 @@ class App extends Component<{}> {
     const { appReady, appInSession, authenticated } = this.props;
 
     if (!appReady || (authenticated && !appInSession)) {
-      return <Session />;
+      return <LandingView />;
     }
 
-    return <View style={styles.container}>{authenticated ? <Session /> : <Session />}</View>;
+    return <View style={styles.container}>{authenticated ? <Session /> : <Session />}</View>;   /* Entrance */
   }
 }
 

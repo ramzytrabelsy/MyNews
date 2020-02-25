@@ -26,7 +26,7 @@ const withStore = connect((state) => ({
 
 const propTypes = {
   ...PropTypes.withState,
-  //user: PropTypes.User.isRequired,
+  user: PropTypes.User.isRequired,
 };
 
 const Wrapper = (C) => withStore(C);

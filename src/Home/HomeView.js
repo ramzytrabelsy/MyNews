@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { StyleSheet, View, Image, ScrollView, RefreshControl } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {
   Container,
   Header,
@@ -17,7 +17,6 @@ import {
   CheckBox,
   Input,
   Item,
-  Card
 } from 'native-base';
 
 import { FlatList } from 'react-native-gesture-handler';
@@ -27,7 +26,9 @@ import { COLOR, STYLE } from '../common/styles';
 
 import * as Interaction from '../Shared/Interaction';
 
-import { $fetchPosts } from './state';
+import {
+  $fetchPosts, $updatePost, $removePost, $createPost,
+} from './state';
 
 const withStore = connect((state) => ({
   processing: state.Activity.processingByOperation[$fetchPosts.OPERATION] || false,
@@ -54,15 +55,9 @@ const styles = StyleSheet.create({
 });
 
 class HomeView extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      refreshing: props.processing,
-      text: '',
-      posts_items: props.posts
-    };
-  }
+  state = {
+    text: '',
+  };
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -70,74 +65,88 @@ class HomeView extends Component {
     dispatch($fetchPosts()).catch((error) => Interaction.toast(Interaction.FAILURE, error.message));
   }
 
-  _searchPost(text) {
-    const { posts } = this.props;
-    const newData = posts.filter(function(item) {
-      const itemData = item.title ? item.title.toUpperCase() : ''.toUpperCase();
-      const textData = text.toUpperCase();
-      return itemData.indexOf(textData) > -1;
-    });
-    this.setState({
-      posts_items: newData,
-      text: text,
-    });
+  createPost() {
+    const { dispatch } = this.props;
+    const { text } = this.state;
+    dispatch($createPost({ title: text }));
+    this.setState({ text: '' });
   }
-
-  _refresh() {
-    const { processing, posts, dispatch } = this.props;
-    this.setState({
-      refreshing: processing
-    }, () => {
-      dispatch($fetchPosts()).catch((error) => Interaction.toast(Interaction.FAILURE, error.message));
-    })
-
-  }
-
 
   render() {
     const { processing, posts, dispatch } = this.props;
-    const { text , posts_items } = this.state;
+    const { text } = this.state;
     return (
       <Container>
         <Header>
           <Left>
-            {processing ? <Spinner size="small" inverse /> : null}
+            <Button transparent onPress={() => this.props.navigation.openDrawer()}>
+              {processing ? <Spinner size="small" inverse /> : <Icon name="menu" />}
+            </Button>
           </Left>
           <Body>
-            <Title>Articles</Title>
+            <Title>Posts</Title>
           </Body>
           <Right />
         </Header>
         <Content padder>
           <Item>
-            <Input placeholder="Search " value={text} onChangeText={(text) => this._searchPost(text)} />
+            <Input placeholder="Add post" value={text} onChangeText={(value) => this.setState({ text: value })} />
+            <Button disabled={processing} onPress={() => this.createPost()}>
+              <Text>save</Text>
+            </Button>
           </Item>
+          {/* {posts && (
+            <Card>
+              {posts.map((item) => (
+                <CardItem key={item.id} button bordered>
+                  <Left>
+                    <CheckBox
+                      checked={item.done}
+                      color={COLOR.primary}
+                      style={styles.checkbox}
+                      onPress={() => dispatch($updatePost(item.id, { done: !item.done }))}
+                    />
+                    <Text style={{ textDecorationLine: item.done ? 'line-through' : 'none' }}>{item.title}</Text>
+                  </Left>
+
+                  <Right>
+                    <Button transparent large><Icon name="create" /></Button>
+                    <Button transparent large onPress={() => dispatch($removePost(item.id))}><Icon name="trash" /></Button>
+                  </Right>
+                </CardItem>
+              ))}
+            </Card>
+          )} */}
 
           <FlatList
             contentContainerStyle={[STYLE.flex_grow, STYLE.padder]}
-            data={posts_items}
-            keyExtractor={(item, index) => index}
-            renderItem={({ item, index }) => (
-
-              <CardItem key={index} button bordered onPress={() => this.props.navigation.navigate('/about', { item: item })}>
+            // ListEmptyComponent={<DataEmpty icon="history" message="Aucune course passée" />}
+            data={posts}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <CardItem key={item.id} button bordered>
                 <Left>
-                  <Image
-                    style={{ width: 50, height: 50 }}
-                    source={{ uri: item.urlToImage }}
+                  <CheckBox
+                    checked={item.done}
+                    color={COLOR.primary}
+                    style={styles.checkbox}
+                    onPress={() => dispatch($updatePost(item.id, { done: !item.done }))}
                   />
-                  <Text>{item.title}</Text>
+                  <Text style={{ textDecorationLine: item.done ? 'line-through' : 'none' }}>{item.title}</Text>
                 </Left>
 
                 <Right>
+                  <View style={STYLE.flex_row}>
+                    <Button transparent style={styles.button}>
+                      <Icon name="create" />
+                    </Button>
+                    <Button transparent style={styles.button} onPress={() => dispatch($removePost(item.id))}>
+                      <Icon name="trash" />
+                    </Button>
+                  </View>
                 </Right>
               </CardItem>
             )}
-            refreshControl={
-              <RefreshControl
-                refreshing={this.state.refreshing}
-                onRefresh={() => this._refresh()}
-              />
-            }
           />
         </Content>
       </Container>

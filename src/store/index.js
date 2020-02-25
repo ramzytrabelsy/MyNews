@@ -9,8 +9,8 @@ import {
 } from 'redux';
 import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
-import persistState, {mergePersistedState } from 'redux-localstorage';
-import adapter from 'redux-localstorage/lib/adapters/localStorage';
+import persistState, { mergePersistedState } from 'redux-localstorage';
+import persistAdapter from 'redux-localstorage/lib/adapters/AsyncStorage';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import $state from './state';
@@ -118,7 +118,7 @@ export function setupStore() {
       storage._put(key, persistSelector(state), callback);
     };
     return storage;
-  })(adapter(AsyncStorage));
+  })(persistAdapter(AsyncStorage));
 
   const persistEnhancer = persistState(persistStorage, 'redux');
 

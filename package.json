@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.7.1",
+    "helloworld-lib": "https://github.com/ramzytrabelsy/helloworld-lib",
     "@react-native-community/masked-view": "^0.1.6",
     "@react-navigation/material-bottom-tabs": "^5.0.5",
     "events": "^3.1.0",
